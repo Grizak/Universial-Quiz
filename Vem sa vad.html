@@ -1,316 +1,180 @@
 <!DOCTYPE html>
-  <head>
-    <title>Vem sa vad</title>
-    <script>
-      let score = 0
-      let answers = 0
-      let correctAnswer1
-      let guess1
-      let guess2
-      let correctAnswer2
-      let guess3
-      let correctAnswer3
-      let guess4
-      let correctAnswer4
-      let correctAnswer5
-      let guess5
-      let guess6
-      let correctAnswer6
-      let guess7
-      let correctAnswer7
-      let guess8
-      let correctAnswer8
-      let correctAnswer9
-      let guess9
-      let guess10
-      let correctAnswer10
-      let guess11
-      let correctAnswer11
-      let guess12
-      let correctAnswer12
-      let correctAnswer13
-      let guess13
-      let guess14
-      let correctAnswer14
-      let guess15
-      let correctAnswer15
-      let guess16
-      let correctAnswer16
-      let correctAnswer17
-      let guess17
-      let guess18
-      let correctAnswer18
-      let guess19
-      let correctAnswer19
-      let guess20
-      let correctAnswer20
-    </script>
-  </head>
-  <body>
-    <p>Välkommen till Vem sa vad</p>
-    <p>Bubbla NR. 1</p>
-    <button onclick="
-      correctAnswer1 = prompt('Välj rätt svar, altså Hult, Johannes, Matias, Josef, Kenny, Timmy,')
-    ">Välj rätt svar</button>
-    <button onclick="
-      guess1 = prompt('Gissa vilket du tror är rätt svar, altså Hult, Johannes, Matias, Josef, Kenny, Timmy,')
-      answers ++
-      if (correctAnswer1 === guess1) {
-        score ++
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Universal Quiz</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      color: #333;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+    h1 {
+      background-color: #4CAF50;
+      color: white;
+      padding: 15px 0;
+      margin: 0;
+    }
+    .container {
+      width: 80%;
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .question {
+      margin-bottom: 15px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      background-color: #f9f9f9;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .question input {
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      width: 60%;
+      max-width: 300px;
+    }
+    .question span {
+      font-weight: bold;
+    }
+    .feedback {
+      color: red;
+      font-style: italic;
+    }
+    .correct-answer {
+      color: green;
+      font-weight: normal;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin: 10px;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+    #score {
+      margin-top: 20px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Universal Quiz</h1>
+    
+    <form id="quizForm">
+      <label for="questionCount">How many questions?</label>
+      <input type="number" id="questionCount" min="1" max="20" value="5">
+      <button type="button" onclick="generateQuiz()">Generate Quiz</button>
+    </form>
+
+    <div id="quizContainer"></div>
+    
+    <button id="submitQuiz" style="display: none;" onclick="submitQuiz()">Submit Quiz</button>
+    <button id="practiceMistakes" style="display: none;" onclick="practiceMistakes()">Practice Your Mistakes</button>
+    <p id="score"></p>
+  </div>
+
+  <script>
+    let correctAnswers = [];
+    let mistakes = [];
+
+    function generateQuiz() {
+      const questionCount = document.getElementById('questionCount').value;
+      const quizContainer = document.getElementById('quizContainer');
+      quizContainer.innerHTML = ''; // Clear any previous questions
+      correctAnswers = []; // Reset correct answers
+      mistakes = []; // Clear previous mistakes
+      
+      for (let i = 1; i <= questionCount; i++) {
+        const correctAnswer = prompt(`Enter correct answer for question ${i}:`);
+        correctAnswers.push(correctAnswer);
+        
+        const questionDiv = document.createElement('div');
+        questionDiv.classList.add('question');
+        questionDiv.innerHTML = `
+          <label>Question ${i}: </label>
+          <input type="text" id="answer${i}" placeholder="Your guess">
+          <span id="feedback${i}" class="feedback" style="display:none;"></span>
+        `;
+        quizContainer.appendChild(questionDiv);
       }
-    ">Gissa</button>
-    <p>Bubbla NR. 2</p>
-    <button onclick="
-      correctAnswer2 = prompt('Välj rätt svar, altså Hult, Johannes, Matias, Josef, Kenny, Timmy,')
-    ">Välj rätt svar</button>
-    <button onclick="
-      guess2 = prompt('Gissa vilket du tror är rätt svar, altså Hult, Johannes, Matias, Josef, Kenny, Timmy,')
-      answers ++
-      if (correctAnswer2 === guess2) {
-        score ++
+      
+      document.getElementById('submitQuiz').style.display = 'block';
+      document.getElementById('practiceMistakes').style.display = 'none'; // Hide "Practice Mistakes" button until needed
+    }
+    
+    function submitQuiz() {
+      const questionCount = correctAnswers.length;
+      let score = 0;
+      mistakes = []; // Reset mistakes array
+      
+      for (let i = 1; i <= questionCount; i++) {
+        const userAnswer = document.getElementById(`answer${i}`).value;
+        const feedbackElement = document.getElementById(`feedback${i}`);
+        
+        if (userAnswer === correctAnswers[i - 1]) {
+          score++;
+          feedbackElement.style.display = 'none'; // Hide feedback if the answer is correct
+        } else {
+          feedbackElement.style.display = 'inline';
+          feedbackElement.innerHTML = ` - Correct answer: <span class="correct-answer">${correctAnswers[i - 1]}</span>`;
+          mistakes.push(i); // Record the question number as a mistake
+        }
       }
-    ">Gissa</button>
-    <p>Bubbla NR. 3</p>
-    <button onclick="
-      correctAnswer3 = prompt('Välj rätt svar, altså Hult, Johannes, Matias, Josef, Kenny, Timmy,')
-    ">Välj rätt svar</button>
-    <button onclick="
-      guess3 = prompt('Gissa vilket du tror är rätt svar, altså Hult, Johannes, Matias, Josef, Kenny, Timmy,')
-      answers ++
-      if (correctAnswer3 === guess3) {
-        score ++
+      
+      document.getElementById('score').innerText = `You scored ${score} out of ${questionCount}`;
+      document.getElementById('submitQuiz').style.display = 'none';
+
+      // Show "Practice Mistakes" button if there are mistakes
+      if (mistakes.length > 0) {
+        document.getElementById('practiceMistakes').style.display = 'block';
       }
-    ">Gissa</button>
-    <p>Bubbla NR. 4</p>
-    <button onclick="
-      correctAnswer4 = prompt('Välj rätt svar, altså Hult, Johannes, Matias, Josef, Kenny, Timmy,')
-    ">Välj rätt svar</button>
-    <button onclick="
-      guess4 = prompt('Gissa vilket du tror är rätt svar, altså Hult, Johannes, Matias, Josef, Kenny, Timmy,')
-      answers ++
-      if (correctAnswer4 === guess4) {
-        score ++
-      }
-    ">Gissa</button>
-    <p>Bubbla NR. 5</p>
-    <button onclick="
-      correctAnswer5 = prompt('Välj rätt svar, altså Hult, Johannes, Matias, Josef, Kenny, Timmy,')
-    ">Välj rätt svar</button>
-    <button onclick="
-      guess5 = prompt('Gissa vilket du tror är rätt svar, altså Hult, Johannes, Matias, Josef, Kenny, Timmy,')
-      answers ++
-      if (correctAnswer5 === guess5) {
-        score ++
-      }
-    ">Gissa</button>
-    <p>Bubbla NR. 6</p>
-    <button onclick="
-      correctAnswer6 = prompt('Välj rätt svar, altså Hult, Johannes, Matias, Josef, Kenny, Timmy,')
-    ">Välj rätt svar</button>
-    <button onclick="
-      guess6 = prompt('Gissa vilket du tror är rätt svar, altså Hult, Johannes, Matias, Josef, Kenny, Timmy,')
-      answers ++
-      if (correctAnswer6 === guess6) {
-        score ++
-      }
-    ">Gissa</button>
-    <p>Bubbla NR. 7</p>
-    <button onclick="
-      correctAnswer7 = prompt('Välj rätt svar, altså Hult, Johannes, Matias, Josef, Kenny, Timmy,')
-    ">Välj rätt svar</button>
-    <button onclick="
-      guess7 = prompt('Gissa vilket du tror är rätt svar, altså Hult, Johannes, Matias, Josef, Kenny, Timmy,')
-      answers ++
-      if (correctAnswer7 === guess7) {
-        score ++
-      }
-    ">Gissa</button>
-    <p>Bubbla NR. 8</p>
-    <button onclick="
-      correctAnswer8 = prompt('Välj rätt svar, altså Hult, Johannes, Matias, Josef, Kenny, Timmy,')
-    ">Välj rätt svar</button>
-    <button onclick="
-      guess8 = prompt('Gissa vilket du tror är rätt svar, altså Hult, Johannes, Matias, Josef, Kenny, Timmy,')
-      answers ++
-      if (correctAnswer8 === guess8) {
-        score ++
-      }
-    ">Gissa</button>
-    <p>Bubbla NR. 9</p>
-    <button onclick="
-      correctAnswer9 = prompt('Välj rätt svar, altså Hult, Johannes, Matias, Josef, Kenny, Timmy,')
-    ">Välj rätt svar</button>
-    <button onclick="
-      guess9 = prompt('Gissa vilket du tror är rätt svar, altså Hult, Johannes, Matias, Josef, Kenny, Timmy,')
-      answers ++
-      if (correctAnswer9 === guess9) {
-        score ++
-      }
-    ">Gissa</button>
-    <p>Bubbla NR. 10</p>
-    <button onclick="
-      correctAnswer10 = prompt('Välj rätt svar, altså Hult, Johannes, Matias, Josef, Kenny, Timmy,')
-    ">Välj rätt svar</button>
-    <button onclick="
-      guess10 = prompt('Gissa vilket du tror är rätt svar, altså Hult, Johannes, Matias, Josef, Kenny, Timmy,')
-      answers ++
-      if (correctAnswer10 === guess10) {
-        score ++
-      }
-    ">Gissa</button>
-    <p>Bubbla NR. 11</p>
-    <button onclick="
-      correctAnswer11 = prompt('Välj rätt svar, altså Hult, Johannes, Matias, Josef, Kenny, Timmy,')
-    ">Välj rätt svar</button>
-    <button onclick="
-      guess11 = prompt('Gissa vilket du tror är rätt svar, altså Hult, Johannes, Matias, Josef, Kenny, Timmy,')
-      answers ++
-      if (correctAnswer11 === guess11) {
-        score ++
-      }
-    ">Gissa</button>
-    <p>Bubbla NR. 12</p>
-    <button onclick="
-      correctAnswer12 = prompt('Välj rätt svar, altså Hult, Johannes, Matias, Josef, Kenny, Timmy,')
-    ">Välj rätt svar</button>
-    <button onclick="
-      guess12 = prompt('Gissa vilket du tror är rätt svar, altså Hult, Johannes, Matias, Josef, Kenny, Timmy,')
-      answers ++
-      if (correctAnswer12 === guess12) {
-        score ++
-      }
-    ">Gissa</button>
-    <p>Bubbla NR. 13</p>
-    <button onclick="
-      correctAnswer13 = prompt('Välj rätt svar, altså Hult, Johannes, Matias, Josef, Kenny, Timmy,')
-    ">Välj rätt svar</button>
-    <button onclick="
-      guess13 = prompt('Gissa vilket du tror är rätt svar, altså Hult, Johannes, Matias, Josef, Kenny, Timmy,')
-      if (correctAnswer13 === guess13) {
-        score ++
-      }
-    ">Gissa</button>
-    <p>Bubbla NR. 14</p>
-    <button onclick="
-      correctAnswer14 = prompt('Välj rätt svar, altså Hult, Johannes, Matias, Josef, Kenny, Timmy,')
-    ">Välj rätt svar</button>
-    <button onclick="
-      guess14 = prompt('Gissa vilket du tror är rätt svar, altså Hult, Johannes, Matias, Josef, Kenny, Timmy,')
-      answers ++
-      if (correctAnswer14 === guess14) {
-        score ++
-      }
-    ">Gissa</button>
-    <p>Bubbla NR. 15</p>
-    <button onclick="
-      correctAnswer15 = prompt('Välj rätt svar, altså Hult, Johannes, Matias, Josef, Kenny, Timmy,')
-    ">Välj rätt svar</button>
-    <button onclick="
-      guess15 = prompt('Gissa vilket du tror är rätt svar, altså Hult, Johannes, Matias, Josef, Kenny, Timmy,')
-      answers ++
-      if (correctAnswer15 === guess15) {
-        score ++
-      }
-    ">Gissa</button>
-    <p>Bubbla NR. 16</p>
-    <button onclick="
-      correctAnswer16 = prompt('Välj rätt svar, altså Hult, Johannes, Matias, Josef, Kenny, Timmy,')
-    ">Välj rätt svar</button>
-    <button onclick="
-      guess16 = prompt('Gissa vilket du tror är rätt svar, altså Hult, Johannes, Matias, Josef, Kenny, Timmy,')
-      answers ++
-      if (correctAnswer16 === guess16) {
-        score ++
-      }
-    ">Gissa</button>
-    <p>Bubbla NR. 17</p>
-    <button onclick="
-      correctAnswer17 = prompt('Välj rätt svar, altså Hult, Johannes, Matias, Josef, Kenny, Timmy,')
-    ">Välj rätt svar</button>
-    <button onclick="
-      guess17 = prompt('Gissa vilket du tror är rätt svar, altså Hult, Johannes, Matias, Josef, Kenny, Timmy,')
-      answers ++
-      if (correctAnswer17 === guess17) {
-        score ++
-      }
-    ">Gissa</button>
-    <p>Bubbla NR. 18</p>
-    <button onclick="
-      correctAnswer18 = prompt('Välj rätt svar, altså Hult, Johannes, Matias, Josef, Kenny, Timmy,')
-    ">Välj rätt svar</button>
-    <button onclick="
-      guess18 = prompt('Gissa vilket du tror är rätt svar, altså Hult, Johannes, Matias, Josef, Kenny, Timmy,')
-      answers ++
-      if (correctAnswer18 === guess18) {
-        score ++
-      }
-    ">Gissa</button>
-    <p>Bubbla NR. 19</p>
-    <button onclick="
-      correctAnswer19 = prompt('Välj rätt svar, altså Hult, Johannes, Matias, Josef, Kenny, Timmy,')
-    ">Välj rätt svar</button>
-    <button onclick="
-      guess19 = prompt('Gissa vilket du tror är rätt svar, altså Hult, Johannes, Matias, Josef, Kenny, Timmy,')
-      answers ++
-      if (correctAnswer19 === guess19) {
-        score ++
-      }
-    ">Gissa</button>
-    <p>Bubbla NR. 20</p>
-    <button onclick="
-      correctAnswer20 = prompt('Välj rätt svar, altså Hult, Johannes, Matias, Josef, Kenny, Timmy,')
-    ">Välj rätt svar</button>
-    <button onclick="
-      guess20 = prompt('Gissa vilket du tror är rätt svar, altså Hult, Johannes, Matias, Josef, Kenny, Timmy,')
-      answers ++
-      if (correctAnswer20 === guess20) {
-        score ++
-      }
-    ">Gissa</button>
-    <p>Färdig? Tryck på knappen</p>
-    <button onclick="
-      alert(`Din score är ${score}/${answers`)
-      score = 0
-      answers = 0
-       correctAnswer1 = 0
-       guess1 = 0
-       guess2 = 0
-       correctAnswer2 = 0
-       guess3 = 0
-       correctAnswer3 = 0
-       guess4 = 0
-       correctAnswer4 = 0
-       correctAnswer5 = 0
-       guess5 = 0
-       guess6 = 0
-       correctAnswer6 = 0
-       guess7 = 0
-       correctAnswer7 = 0
-       guess8 = 0
-       correctAnswer8 = 0
-       correctAnswer9 = 0
-       guess9 = 0
-       guess10 = 0
-       correctAnswer10 = 0
-       guess11 = 0
-       correctAnswer11 = 0
-       guess12 = 0
-       correctAnswer12 = 0
-       correctAnswer13 = 0
-       guess13 = 0
-       guess14 = 0
-       correctAnswer14 = 0
-       guess15 = 0
-       correctAnswer15 = 0
-       guess16 = 0
-       correctAnswer16 = 0
-       correctAnswer17 = 0
-       guess17 = 0
-       guess18 = 0
-       correctAnswer18 = 0
-       guess19 = 0
-       correctAnswer19 = 0
-       guess20 = 0
-       correctAnswer20 = 0
-    ">Färdig</button>
-  </body>
+    }
+
+    function practiceMistakes() {
+      const quizContainer = document.getElementById('quizContainer');
+      quizContainer.innerHTML = ''; // Clear the previous questions
+
+      mistakes.forEach((questionNumber) => {
+        const questionDiv = document.createElement('div');
+        questionDiv.classList.add('question');
+        questionDiv.innerHTML = `
+          <label>Question ${questionNumber}: </label>
+          <input type="text" id="answer${questionNumber}" placeholder="Your guess">
+          <span id="feedback${questionNumber}" class="feedback" style="display:none;"></span>
+        `;
+        quizContainer.appendChild(questionDiv);
+      });
+
+      // Show "Submit Quiz" button again for practicing
+      document.getElementById('submitQuiz').style.display = 'block';
+      document.getElementById('practiceMistakes').style.display = 'none'; // Hide the "Practice Mistakes" button while practicing
+    }
+  </script>
+</body>
+</html>
